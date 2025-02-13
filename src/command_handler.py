@@ -36,6 +36,8 @@ class CommandHandler:
 
         parser_generate = subparsers.add_parser('generate', help='Generate daily report from markdown file')
         parser_generate.add_argument('file', type=str, help='The markdown file to generate report from')
+        parser_generate.add_argument('--dry-run', action='store_true', help='Simulate the report generation without '
+                                                                            'making changes')
         parser_generate.set_defaults(func=self.generate_daily_report)
 
         parser_help = subparsers.add_parser('help', help='Show help message')
@@ -58,16 +60,18 @@ class CommandHandler:
             print(f"  - {sub}")
 
     def fetch_updates(self, args):
-        updates = self.github_client.fetch_updates()
-        for update in updates:
-            print(update)
+        subscriptions = self.subscription_manager.list_subscriptions()
+        for repo in subscriptions:
+            print(f"fetching {repo} updates:")
+            updates = self.github_client.fetch_updates(repo)
+            print(updates)
 
     def export_daily_progress(self, args):
         self.github_client.export_daily_progress(args.repo)
         print(f"Exported daily progress for repository: {args.repo}")
 
     def generate_daily_report(self, args):
-        self.report_generator.generate_daily_report(args.file)
+        self.report_generator.generate_daily_report(args.file,args.dry_run)
         print(f"Generated daily report from file: {args.file}")
 
     def print_help(self, args=None):
