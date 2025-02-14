@@ -19,7 +19,7 @@ class LLM:
         response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": prompt}
             ]
         )
         print("After call GPT")
