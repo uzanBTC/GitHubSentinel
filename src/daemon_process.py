@@ -26,7 +26,8 @@ def github_job(subscription_manager, github_client, report_generator, notifier, 
         markdown_file_path = github_client.export_progress_by_date_range(repo, days)
         # 从Markdown文件自动生成进展简报
         report, report_file_path = report_generator.generate_report_by_date_range(markdown_file_path, days)
-        notifier.notify(repo, report)
+        subject=f"[Github Sentinel] {repo} 进展简报"
+        notifier.notify(subject, report)
     LOG.info(f"[定时任务执行完毕]")
 
 
