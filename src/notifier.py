@@ -34,6 +34,8 @@ class Notifier:
         except Exception as e:
             LOG.error(f"发送邮件失败：{str(e)}")
 
+    ## todo: email subscription for hackernews
+
 if __name__ == '__main__':
     from config import Config
     config = Config()

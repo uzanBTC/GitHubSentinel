@@ -7,7 +7,7 @@ class Config:
     
     def load_config(self):
         # 尝试从环境变量获取配置或使用 config.json 文件中的配置作为回退
-        with open('config.json', 'r') as f:
+        with open('../config.json', 'r') as f:
             config = json.load(f)
             
             # 使用环境变量或配置文件的 GitHub Token
@@ -22,4 +22,6 @@ class Config:
             # 默认每天执行
             self.freq_days = config.get('github_progress_frequency_days', 1)
             # 默认早上8点更新 (操作系统默认时区是 UTC +0，08点刚好对应北京时间凌晨12点)
-            self.exec_time = config.get('github_progress_execution_time', "08:00") 
+            self.exec_time = config.get('github_progress_execution_time', "08:00")
+            # dry_run模式，开启后绕过llm大模型的连接，直接输出prompt
+            self.dry_run = config.get('dry_run',False)

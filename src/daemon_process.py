@@ -58,7 +58,7 @@ def main():
         LOG.error(f"主进程发生异常: {str(e)}")
         sys.exit(1)
 
-
+    ## todo: daemon for hackernews
 
 if __name__ == '__main__':
     main()

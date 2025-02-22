@@ -10,6 +10,8 @@ LOG_FILE="./logs/$DAEMON_NAME.log"
 # 定义守护进程的 PID 文件路径，用于存储进程号
 PID_FILE="./run/$DAEMON_NAME.pid"
 
+## todo: daemon for hackernews
+
 # 启动守护进程的函数
 start() {
     echo "Starting $DAEMON_NAME..."
