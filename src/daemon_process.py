@@ -1,4 +1,4 @@
-import schedule # 导入 schedule 实现定时任务执行器
+import schedule  # 导入 schedule 实现定时任务执行器
 import time  # 导入time库，用于控制时间间隔
 import signal  # 导入signal库，用于信号处理
 import sys  # 导入sys库，用于执行系统相关的操作
@@ -8,6 +8,7 @@ from github_client import GitHubClient  # 导入GitHub客户端类，处理GitHu
 from notifier import Notifier  # 导入通知器类，用于发送通知
 from report_generator import ReportGenerator  # 导入报告生成器类
 from llm import LLM  # 导入语言模型类，可能用于生成报告内容
+from src.hackernews_client import HackerNewsClient
 from subscription_manager import SubscriptionManager  # 导入订阅管理器类，管理GitHub仓库订阅
 from logger import LOG  # 导入日志记录器
 
@@ -16,6 +17,7 @@ def graceful_shutdown(signum, frame):
     # 优雅关闭程序的函数，处理信号时调用
     LOG.info("[优雅退出]守护进程接收到终止信号")
     sys.exit(0)  # 安全退出程序
+
 
 def github_job(subscription_manager, github_client, report_generator, notifier, days):
     LOG.info("[开始执行定时任务]")
@@ -26,10 +28,19 @@ def github_job(subscription_manager, github_client, report_generator, notifier, 
         markdown_file_path = github_client.export_progress_by_date_range(repo, days)
         # 从Markdown文件自动生成进展简报
         report, report_file_path = report_generator.generate_report_by_date_range(markdown_file_path, days)
-        subject=f"[Github Sentinel] {repo} 进展简报"
+        subject = f"[Github Sentinel] {repo} 进展简报"
         notifier.notify(subject, report)
     LOG.info(f"[定时任务执行完毕]")
 
+
+def hackernews_job(hackernews_client: HackerNewsClient, report_generator: ReportGenerator, notifier: Notifier,
+                   days: int):
+    LOG.info("[开始执行HackerNews定时任务]")
+    markdown_file_path = hackernews_client.export_hackernews_top_stories()
+    report, report_file_path = report_generator.generate_hackernews_trends_report(markdown_file_path)
+    subject = f"[HackerNews] 趋势简报"
+    notifier.notify(subject, report)
+    LOG.info("[HackerNews定时任务执行完毕]")
 
 def main():
     # 设置信号处理器
@@ -37,6 +48,7 @@ def main():
 
     config = Config()  # 创建配置实例
     github_client = GitHubClient(config.github_token)  # 创建GitHub客户端实例
+    hackernews_client=HackerNewsClient()
     notifier = Notifier(config.email)  # 创建通知器实例
     llm = LLM()  # 创建语言模型实例
     report_generator = ReportGenerator(llm)  # 创建报告生成器实例
@@ -44,6 +56,7 @@ def main():
 
     # 启动时立即执行（如不需要可注释）
     github_job(subscription_manager, github_client, report_generator, notifier, config.freq_days)
+    hackernews_job(hackernews_client,report_generator,notifier,config.freq_days)
 
     # 安排每天的定时任务
     schedule.every(config.freq_days).days.at(
@@ -59,7 +72,7 @@ def main():
         LOG.error(f"主进程发生异常: {str(e)}")
         sys.exit(1)
 
-    ## todo: daemon for hackernews
+
 
 if __name__ == '__main__':
     main()
