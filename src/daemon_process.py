@@ -33,8 +33,7 @@ def github_job(subscription_manager, github_client, report_generator, notifier, 
     LOG.info(f"[定时任务执行完毕]")
 
 
-def hackernews_job(hackernews_client: HackerNewsClient, report_generator: ReportGenerator, notifier: Notifier,
-                   days: int):
+def hackernews_job(hackernews_client: HackerNewsClient, report_generator: ReportGenerator, notifier: Notifier):
     LOG.info("[开始执行HackerNews定时任务]")
     markdown_file_path = hackernews_client.export_hackernews_top_stories()
     report, report_file_path = report_generator.generate_hackernews_trends_report(markdown_file_path)
@@ -58,10 +57,17 @@ def main():
     github_job(subscription_manager, github_client, report_generator, notifier, config.freq_days)
     hackernews_job(hackernews_client,report_generator,notifier,config.freq_days)
 
-    # 安排每天的定时任务
+    # 安排每天github sentinel的定时任务
     schedule.every(config.freq_days).days.at(
         config.exec_time
     ).do(github_job, subscription_manager, github_client, report_generator, notifier, config.freq_days)
+
+    # 安排每天hackernews的定时任务
+    schedule.every(config.hackernews_freq_hours).hours.at(
+        config.exec_time
+    ).do(hackernews_job, hackernews_client, report_generator, notifier)
+
+
 
     try:
         # 在守护进程中持续运行

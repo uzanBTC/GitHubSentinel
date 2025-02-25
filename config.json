@@ -11,5 +11,8 @@
     "subscriptions_file": "../subscriptions.json",
     "github_progress_frequency_days": 1,
     "github_progress_execution_time":"08:00",
-    "dry_run": true
+    "hackernews_progress_frequency_hours": 1,
+    "dry_run": false,
+    "is_ollama": true,
+    "model_name": "deepseek-r1:7b"
 }

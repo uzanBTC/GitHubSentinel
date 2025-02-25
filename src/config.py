@@ -23,5 +23,8 @@ class Config:
             self.freq_days = config.get('github_progress_frequency_days', 1)
             # 默认早上8点更新 (操作系统默认时区是 UTC +0，08点刚好对应北京时间凌晨12点)
             self.exec_time = config.get('github_progress_execution_time', "08:00")
+            self.hackernews_freq_hours=config.get('hackernews_progress_frequency_hours',1)
+            self.is_ollama=config.get('is_ollama',False)
+            self.model_name=config.get('model_name','gpt-4o-mini')
             # dry_run模式，开启后绕过llm大模型的连接，直接输出prompt
             self.dry_run = config.get('dry_run',False)
